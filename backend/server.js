@@ -1,11 +1,13 @@
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
-const connectDB = require('./config/db.js');
-const authRoutes = require('./routes/authRoutes.js');
-const incomeRoutes = require('./routes/incomeRoutes.js');
-const expenseRoutes = require('./routes/expenseRoutes.js');
-const dashboardRoutes = require('./routes/dashboardRoutes.js');
+const connectDB = require('./src/config/db.js');
+const authRoutes = require('./src/routes/authRoutes.js');
+const incomeRoutes = require('./src/routes/incomeRoutes.js');
+const expenseRoutes = require('./src/routes/expenseRoutes.js');
+const dashboardRoutes = require('./src/routes/dashboardRoutes.js');
+const errorMiddleware = require('./src/middleware/errorMiddleware.js');
+const API_VERSION = process.env.API_VERSION;
 const path = require('path');
 
 const app = express();
@@ -27,10 +29,15 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 connectDB();
 
 // Routes
-app.use("/api/v1/auth", authRoutes);
-app.use("/api/v1/income", incomeRoutes);
-app.use("/api/v1/expense", expenseRoutes);
-app.use("/api/v1/dashboard", dashboardRoutes);
+app.use(`${API_VERSION}/auth`, authRoutes);
+app.use(`${API_VERSION}/income`, incomeRoutes);
+app.use(`${API_VERSION}/expense`, expenseRoutes);
+app.use(`${API_VERSION}/dashboard`, dashboardRoutes);
+
+
+// Error Handling Middleware
+app.use(errorMiddleware);
+
 // Start Server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
